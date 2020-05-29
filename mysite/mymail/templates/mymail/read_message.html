@@ -1,0 +1,18 @@
+{% if message %}
+    Sender: <a>{{ message.sender }}</a>
+    {% if message.send_date %}
+        {{ message.send_date }}<br>
+    {% endif %}
+    <br>Receivers:</br>
+    {% for receiver in message.receivers.all %}
+        {{ receiver.username }}<br>
+    {% endfor %}
+    {% for email in message.emails %}
+        {{ email }}<br>
+    {% endfor %}
+    {{message.external_receivers}}
+    <h1><a>{{ message.title }}</a></h1>
+    <br>{{ message.text }}</br>
+
+{% endif %}
+<a href="/">home</a>

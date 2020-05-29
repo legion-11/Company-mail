@@ -1,0 +1,36 @@
+{%  if form.errors %}
+    <p>Date error</p>
+{% endif %}
+{% if user.is_authenticated %}
+    <form method="post" action="{% url 'create_message' %}"> {% csrf_token %}
+        <div>
+            <td>{{ form.receivers.label_tag }}</td><br>
+            <td>{{ form.receivers }}</td>
+        </div>
+        <div>
+            <td>{{ form.emails.label_tag }}</td><br>
+            <td>{{ form.emails }}</td>
+        </div>
+        <div>
+            <td>{{ form.title.label_tag }}</td><br>
+            <td>{{ form.title }}</td>
+        </div>
+        <div>
+            <td>{{ form.text.label_tag }}</td><br>
+            <td>{{ form.text }}</td>
+        </div>
+        <div>
+            <td>{{ form.send_date.label_tag }}</td><br>
+            <td>{{ form.send_date }}</td>
+
+        </div>
+        <div>
+            <input type="submit" value="submit" />
+            <input type="hidden" name="next" value="{{ next }}" />
+        </div>
+    </form>
+
+{% else %}
+    <p>you are not authenticated</p>
+    <a href="/login">Login</a>
+{% endif %}
