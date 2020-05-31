@@ -2,6 +2,7 @@ from django import forms
 from .models import User, Message, Metadata
 import django.utils.timezone as timezone
 from multi_email_field.forms import MultiEmailField
+from django.utils.translation import gettext as _
 
 
 class UserForm(forms.ModelForm):
@@ -39,20 +40,23 @@ class DateTimeInput(forms.DateTimeInput):
 
 
 class MessageForm(forms.ModelForm):
+    receivers = forms.ModelMultipleChoiceField(User.objects, required=False)
     title = forms.CharField(required=False)
     text = forms.Textarea()
     send_date = forms.DateTimeField(required=False, widget=DateTimeInput,
                                     input_formats=["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"])
     emails = MultiEmailField(required=False)
+    #file_field = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
     class Meta:
         model = Message
-        fields = ['receivers', 'title', 'text', 'send_date', 'emails']
+        fields = ['receivers', 'emails', 'title', 'text', 'send_date']
 
     def clean_send_date(self):
         date = self.cleaned_data.get('send_date')
-        print(date)
         if date:
             if date < timezone.now():
-                raise forms.ValidationError('Date error')
+                raise forms.ValidationError(_('Invalid value: %(value)s'),
+                        params={'value': date},
+                    )
         return date

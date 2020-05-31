@@ -6,16 +6,9 @@
     <a href="/">Home</a>
 {% else %}
     <form method="post" action="{% url 'login_view' %}"> {% csrf_token %}
-            <div>
-                <td>{{ form.username.label_tag }}</td><br>
-                <td>{{ form.username }}</td>
-            </div>
-            <div>
-                <td>{{ form.password.label_tag }}</td><br>
-                <td>{{ form.password }}</td>
-            </div>
-            <div>
-                <input type="submit" value="login" />
-            </div>
-        </form>
+        {{form.as_p}}
+        <div>
+            <input type="submit" value="login" />
+        </div>
+    </form>
 {% endif %}

@@ -1,0 +1,16 @@
+{% if user.is_authenticated %}
+    <div>
+        <a>{{ user.username }}</a>
+        <a href="{% url 'search_send' 0 %}">Send messages</a>
+        <a href="{% url 'search_received' 0 %}">Received messages</a>
+        <a href="{% url 'create_message' %}">Create message</a>
+        <a href="{% url 'search_templates' 0 %}">Templates</a>
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+
+{% else %}
+    <div>
+        <a href="{% url 'login' 0 %}">Login</a>
+        <a href="{% url 'registration' 0 %}">Refistration</a>
+    </div>
+{% endif %}

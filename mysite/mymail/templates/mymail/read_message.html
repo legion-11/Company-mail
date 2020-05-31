@@ -1,3 +1,4 @@
+{% include "mymail/base.html" %}
 {% if message %}
     Sender: <a>{{ message.sender }}</a>
     {% if message.send_date %}
@@ -5,7 +6,7 @@
     {% endif %}
     <br>Receivers:</br>
     {% for receiver in message.receivers.all %}
-        {{ receiver.username }}<br>
+        {{ receiver.user.username }}<br>
     {% endfor %}
     {% for email in message.emails %}
         {{ email }}<br>
@@ -15,4 +16,3 @@
     <br>{{ message.text }}</br>
 
 {% endif %}
-<a href="/">home</a>

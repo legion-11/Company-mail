@@ -7,20 +7,9 @@
     <a href="/">Home</a>
 {% else %}
     <form method="post" action="{% url 'registration' %}"> {% csrf_token %}
+            {{form.as_p}}
             <div>
-                <td>{{ form.username.label_tag }}</td><br>
-                <td>{{ form.username }}</td>
-            </div>
-            <div>
-                <td>{{ form.password.label_tag }}</td><br>
-                <td>{{ form.password }}</td>
-            </div>
-            <div>
-                <td>{{ form.password2.label_tag }}</td><br>
-                <td>{{ form.password2 }}</td>
-            </div>
-            <div>
-                <input type="submit" value="login" />
+                <input type="submit" value="submit" />
                 <input type="hidden" name="next" value="{{ next }}" />
             </div>
         </form>

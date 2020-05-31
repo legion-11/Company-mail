@@ -1,33 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    {% if user.is_authenticated %}
-    <p>Hello  {{ user.username }}</p>
-    <a href="{% url 'logout' %}">LOG OUT</a>
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-                <li><a href="{% url 'read_message' message.url %}">{{ message.title }}</a></li>
-            {% endfor %}
-            {% if prev_page > -1%}
-                <a href="{% url 'search_received' prev_page %}">previous</a>
-            {% endif %}
-            {% if more%}
-                <a href="{% url 'search_received' next_page %}">next</a>
-            {% endif %}
-        </ul>
-        {% else %}
-            <p>No messages.</p>
+{% include "mymail/base.html" %}
+{% if user.is_authenticated %}
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+            {% if template%}
+                <li><a href="{% url 'create_from_template' message.url %}">{{ message.title|add:"." }}</a></li>
+            {%else%}
+                <li><a href="{% url 'read_message' message.url %}">{{ message.title|add:"." }}</a></li>
+            {% endif%}
+        {% endfor %}
+        {% if prev_page > -1%}
+            <a href="{% url 'search_received' prev_page %}">previous</a>
         {% endif %}
+        {% if more%}
+            <a href="{% url 'search_received' next_page %}">next</a>
+        {% endif %}
+    </ul>
     {% else %}
-        <a href="{% url 'login_view' %}">LOGIN</a></body><br/>
-        <a href="{% url 'registration' %}">REGISTRATION</a>
+        <p>No messages.</p>
     {% endif %}
-
-
-</body>
-</html>
+{% else %}
+    <a href="{% url 'login_view' %}">LOGIN</a></body><br/>
+    <a href="{% url 'registration' %}">REGISTRATION</a>
+{% endif %}

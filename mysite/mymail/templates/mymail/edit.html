@@ -1,6 +1,6 @@
 {% include "mymail/base.html" %}
 {% if user.is_authenticated %}
-    <form method="post" action="{% url 'create_message' %}"> {% csrf_token %}
+    <form method="post" action="{% url 'read_message' message.url %}"> {% csrf_token %}
         {{form.as_p}}
         <div>
             <input type="submit" value="submit" />
