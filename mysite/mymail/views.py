@@ -37,24 +37,26 @@ def del_shcedule(message):
         print('not found')
 
 
+def search(request, page, messages):
+    number_print = 30
+    more = len(messages) > number_print * (page + 1)
+    return render(request, 'mymail/search.html',
+                  {"messages": messages[number_print * page: number_print * (page + 1)],
+                   "next_page": page + 1,
+                   "prev_page": page - 1,
+                   "more": more})
+
+
 def search_received(request, page):
     activate('Europe/Kiev')
     if request.user.is_authenticated:
-        number_print = 30
         current_user = request.user
         messages = Message.objects.filter(receivers__user=current_user) \
             .exclude(send_date__isnull=False, send_date__gt=datetime.datetime.now())\
             .exclude(sender=current_user)\
             .order_by('-id')
 
-        print(messages.filter(sender=current_user))
-        print(messages.all().exclude(sender=current_user))
-        more = len(messages) > number_print * (page + 1)
-        return render(request, 'mymail/search.html',
-                      {"messages": messages[number_print * page: number_print * (page + 1)],
-                       "next_page": page + 1,
-                       "prev_page": page - 1,
-                       "more": more})
+        return search(request, page, messages)
     else:
         return render(request, 'mymail/search.html')
 
@@ -62,15 +64,9 @@ def search_received(request, page):
 def search_send(request, page):
     activate('Europe/Kiev')
     if request.user.is_authenticated:
-        number_print = 30
         current_user = request.user
         messages = Message.objects.filter(sender=current_user).order_by('-id')
-        more = len(messages) > number_print * (page + 1)
-        return render(request, 'mymail/search.html',
-                      {"messages": messages[number_print * page: number_print * (page + 1)],
-                       "next_page": page + 1,
-                       "prev_page": page - 1,
-                       "more": more})
+        return search(request, page, messages)
     else:
         return render(request, 'mymail/search.html')
 
@@ -141,34 +137,14 @@ def redir(request):
 def search_templates(request, page):
     activate('Europe/Kiev')
     if request.user.is_authenticated:
-        number_print = 30
         current_user = request.user
         messages = Message.objects.filter(receivers__user=current_user, sender=current_user).order_by('-id')
-        more = len(messages) > number_print * (page + 1)
-        return render(request, 'mymail/search.html',
-                      {"messages": messages[number_print * page: number_print * (page + 1)],
-                       "next_page": page + 1,
-                       "prev_page": page - 1,
-                       "more": more,
-                       "template": True})
+        return search(request, page, messages)
     else:
         return render(request, 'mymail/search.html')
 
 
-def create_message(request, message_url=''):
-    activate('Europe/Kiev')
-    try:
-        message = Message.objects.get(url=message_url, sender=request.user)
-        initial_dict = {
-            "title": message.title,
-            "receivers": [r.user for r in message.receivers.all()],
-            "text": message.text,
-            "send_date": message.send_date,
-            "emails": message.emails
-        }
-    except ObjectDoesNotExist:
-        initial_dict = {}
-    form = MessageForm(request.POST or None, initial=initial_dict)
+def creation(request, form):
     if request.method == "POST" and form.is_valid():
         print("request - {}".format(request.POST))
         data = form.cleaned_data
@@ -189,9 +165,30 @@ def create_message(request, message_url=''):
             for receiver in receivers:
                 r = Receivers(user=receiver, message=message)
                 r.save()
-
         return redirect('send/0')
     return render(request, "mymail/create_message.html", locals())
+
+
+def create_from_template(request, message_url):
+    activate('Europe/Kiev')
+    try:
+        message = Message.objects.get(url=message_url, sender=request.user)
+        initial_dict = {
+            "title": message.title,
+            "receivers": [r.user for r in message.receivers.all()],
+            "text": message.text,
+            "send_date": message.send_date,
+            "emails": message.emails
+        }
+    except ObjectDoesNotExist:
+        return redirect('create_message')
+    form = MessageForm(request.POST or None, initial=initial_dict)
+    return creation(request, form)
+
+
+def create_message(request):
+    form = MessageForm(request.POST or None)
+    return creation(request, form)
 
 
 def registration(request):
