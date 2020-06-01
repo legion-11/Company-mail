@@ -1,16 +1,57 @@
 {% include "mymail/base.html" %}
+{% block content %}
+<div class="container ml-4 mt-2 col-6">
+
 {% if user.is_authenticated %}
-    <form method="post" action="{% url 'read_message' message.url %}"> {% csrf_token %}
-        {{form.as_p}}
-        <div>
-            <input type="submit" value="submit" />
-            <input type="hidden" name="next" value="{{ next }}" />
+    <form action="{% url 'read_message' message.url %}" method="post"> {% csrf_token %}
+        <div class="form-group">
+            <label class="h5 label" for="id_receivers">{{form.receivers.label}}</label>
+            {{form.receivers}}
         </div>
+
+        <div class="form-group">
+            <label class="h5 label" for="id_emails">{{form.emails.label}}</label>
+            {{ form.emails }}
+        </div>
+
+        <div class="form-group row">
+            <label class="h5 col-sm-3 col-form-label" for="id_title">{{form.title.label}}:</label>
+            <div class="col-sm-9">
+                {{ form.title }}
+            </div>
+
+        </div>
+
+        <div class="form-group row">
+            <label class="h5 col-sm-3 col-form-label" for="id_text">{{form.text.label}}:</label>
+            <div class="col-sm-9">
+                {{ form.text }}
+            </div>
+
+        </div>
+
+        <div class="form-group row">
+            <label class="h5 col-3 col-form-label" for="id_send_date">{{form.send_date.label}}:</label>
+            <div class="col-9">
+                {{form.send_date}}
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Submit form</button>
+        <input name="next" type="hidden" value="{{ next }}"/>
+
     </form>
-    <form action="{% url 'just_delete' message.url %}" method="post">
+
+    <form class="mt-1" action="{% url 'just_delete' message.url %}" method="post">
         {% csrf_token %}
-    <input type="submit" value="Delete">
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+
+
 {% else %}
     <p>you are not authenticated</p>
     <a href="/login">Login</a>
 {% endif %}
+
+</div>
+{% endblock %}

@@ -1,17 +1,52 @@
 {% include "mymail/base.html" %}
+
+{% block content %}
+<div class="container mt-2 ml-2">
+
 {% if user.is_authenticated %}
     <form method="post" action="{% url 'create_message' %}"> {% csrf_token %}
-        {{form.as_p}}
-        <div>
-            <input type="submit" value="submit" />
-            <input type="hidden" name="next" value="{{ next }}" />
+        <div class="form-group">
+            <label class="h5 label" for="id_receivers">{{form.receivers.label}}</label>
+            {{form.receivers}}
         </div>
+
+        <div class="form-group">
+            <label class="h5 label" for="id_emails">{{form.emails.label}}</label>
+            {{ form.emails }}
+        </div>
+
+        <div class="form-group row">
+            <label class="h5 col-sm-3 col-form-label" for="id_title">{{form.title.label}}:</label>
+            <div class="col-sm-9">
+                {{ form.title }}
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="h5 col-sm-3 col-form-label" for="id_text">{{form.text.label}}:</label>
+            <div class="col-sm-9">
+                {{ form.text }}
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="h5 col-3 col-form-label" for="id_send_date">{{form.send_date.label}}:</label>
+            <div class="col-9">
+                {{form.send_date}}
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Submit form</button>
         {% if template %}
-            <a href="{% url 'delete_template' message.url %}">Delete
+            <a href="{% url 'delete_template' message.url %}">Delete</a>
         {% endif %}
+        <input type="hidden" name="next" value="{{ next }}"/>
+
     </form>
 
 {% else %}
-    <p>you are not authenticated</p>
-    <a href="/login">Login</a>
+    <h1 class="ml-5 center text-center">You are not authenticated</h1>
 {% endif %}
+
+</div>
+{% endblock %}

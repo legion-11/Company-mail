@@ -1,0 +1,59 @@
+<div class="header row bg-primary">
+    <div class="col-3 ml-0 text-center my-auto">
+        <a class="text-decoration-none h1 text-white font-weight-bold" href="{% url 'home' %}">
+            Company Mail
+        </a>
+    </div>
+
+    <div class="col-2 text-center my-auto">
+        <a class="text-decoration-none h4 text-white font-weight-bold" href="{% url 'search_send' 0 %}">
+            Send messages
+        </a>
+    </div>
+
+    <div class="col-2 text-center my-auto">
+        <a class="text-decoration-none h4 text-white font-weight-bold" href="{% url 'search_received' 0 %}">
+            Received messages
+        </a>
+    </div>
+
+    <div class="col-2 text-center my-auto">
+        <a class="text-decoration-none h4 text-white font-weight-bold" href="{% url 'create_message' %}">
+            Create message
+        </a>
+    </div>
+
+    <div class="col-2 text-center my-auto">
+        <a class="text-decoration-none h4 text-white font-weight-bold" href="{% url 'search_templates' 0 %}">
+            Templates
+        </a>
+    </div>
+
+    <div class="col-1">
+        {% if user.is_authenticated %}
+            <div class="row font-weight-bold text-white h5 mr-2">
+                Hi, {{ user.username }}
+            </div>
+            <div class="row">
+                <a class="font-weight-bold text-decoration-none text-white h5"
+                   href="{% url 'logout' %}">
+                    Logout
+                </a>
+            </div>
+        {% else %}
+            <div class="row">
+                <a class="font-weight-bold text-decoration-none text-white text-justify h5"
+                   href="{% url 'login_view' %}">
+                    Login
+                </a>
+            </div>
+            <div class="row">
+                <a class="font-weight-bold text-decoration-none text-white text-justify h5"
+                   href="{% url 'registration' %}">
+                    Register
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+</div>

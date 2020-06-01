@@ -1,7 +1,8 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView, LoginView
-
+from django_registration.backends.one_step.views import RegistrationView
 from . import views
+
 
 urlpatterns = [
     path('', views.redir, name='home'),
@@ -14,7 +15,10 @@ urlpatterns = [
     path('just_delete/<uuid:message_url>', views.just_delete, name='just_delete'),
     path('delete/<uuid:message_url>/Template', views.delete_template, name='delete_template'),
     path('new/<uuid:message_url>', views.create_from_template, name='create_from_template'),
-    path(r'registration/', views.registration, name='registration'),
+    # path(r'registration/', views.registration, name='registration'),
+    path(r'registration/',
+         RegistrationView.as_view(template_name="mymail/registration.html", success_url="/"),
+         name='registration'),
     path(r'logout/', LogoutView.as_view(), name='logout'),
     path(r'login/', LoginView.as_view(template_name="mymail/login.html"), name='login_view'),
 

@@ -1,22 +1,40 @@
 {% include "mymail/base.html" %}
+
+{% block content %}
+
+<div class="container ml-2">
+
 {% if user.is_authenticated %}
+    <p class="h2 mt-2">Received Messages</p>
     {% if messages %}
-    <ul>
-        {% for message in messages %}
-            {% if template %}
-                <li><a href="{% url 'create_from_template' message.url %}">{{ message.title|add:"." }}</a></li>
-            {%else%}
-                <li><a href="{% url 'read_message' message.url %}">{{ message.title|add:"." }}</a></li>
-            {% endif%}
-        {% endfor %}
-        {% if prev_page > -1%}
-            <a href="{% url 'search_received' prev_page %}">previous</a>
-        {% endif %}
-        {% if more%}
-            <a href="{% url 'search_received' next_page %}">next</a>
-        {% endif %}
-    </ul>
+        <ul class="list-group list-group-flush">
+            {% for message in messages %}
+                <li class="list-group-item">
+                    {% if template %}
+                    <a class="h3 text-primary" href="{% url 'create_from_template' message.url %}">
+                        {{ message.title|add:"." }}
+                    </a>
+                    {% else %}
+                    <a class="h3 text-primary" href="{% url 'read_message' message.url %}">{{ message.title|add:"." }}</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+
+            {% if prev_page > -1%}
+                <a href="{% url 'search_received' prev_page %}">previous</a>
+            {% endif %}
+            {% if more%}
+                <a href="{% url 'search_received' next_page %}">next</a>
+            {% endif %}
+        </ul>
+
     {% else %}
         <p>No messages.</p>
     {% endif %}
+{% else %}
+    <h1 class="ml-5 center text-center">You are not authenticated</h1>
 {% endif %}
+
+</div>
+
+{% endblock %}
