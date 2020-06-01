@@ -12,6 +12,8 @@ class Message(models.Model):
     text = models.TextField(blank=True, null=True)
     send_date = models.DateTimeField('date to send', blank=True, null=True)
     pub_date = models.DateTimeField('date message created', auto_now_add=True)
+    show = models.BooleanField(default=True)
+    show_template = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.title)
@@ -25,6 +27,7 @@ class Receivers(models.Model):
     user = models.ForeignKey(User, blank=True, default=None, related_name='user', on_delete=models.CASCADE)
     read = models.BooleanField(default=False)
     message = models.ForeignKey(Message, blank=True, default=None, related_name='receivers', on_delete=models.CASCADE)
+    show = models.BooleanField(default=True)
 
     def __str__(self):
         return "{} {}".format(str(self.id), str(self.user))

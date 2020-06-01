@@ -3,7 +3,10 @@
     Sender: <a>{{ message.sender }}</a>
     {% if message.send_date %}
         {{ message.send_date }}<br>
+    {% else %}
+        {{ message.pub_date }}<br>
     {% endif %}
+
     <br>Receivers:</br>
     {% for receiver in message.receivers.all %}
         {{ receiver.user.username }}<br>
@@ -14,5 +17,9 @@
     {{message.external_receivers}}
     <h1><a>{{ message.title }}</a></h1>
     <br>{{ message.text }}</br>
+    <form action="{% url 'delete' message.url %}" method="post">
+        {% csrf_token %}
+    <input type="submit" value="Delete">
 
+</form>
 {% endif %}

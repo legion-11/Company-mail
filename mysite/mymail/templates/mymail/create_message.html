@@ -6,6 +6,9 @@
             <input type="submit" value="submit" />
             <input type="hidden" name="next" value="{{ next }}" />
         </div>
+        {% if template %}
+            <a href="{% url 'delete_template' message.url %}">Delete
+        {% endif %}
     </form>
 
 {% else %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from .forms import UserForm, LoginForm, MessageForm
 from .models import Message, Receivers
 import datetime
@@ -9,7 +9,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from django.utils.timezone import activate, now
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
-
+from django.db.models import Count, Q
 scheduler = BackgroundScheduler()
 scheduler.start()
 
@@ -37,23 +37,22 @@ def del_shcedule(message):
         print('not found')
 
 
-def search(request, page, messages):
+def search(request, page, messages, template=False):
     number_print = 30
     more = len(messages) > number_print * (page + 1)
     return render(request, 'mymail/search.html',
                   {"messages": messages[number_print * page: number_print * (page + 1)],
                    "next_page": page + 1,
                    "prev_page": page - 1,
-                   "more": more})
+                   "more": more, "template": template})
 
 
 def search_received(request, page):
     activate('Europe/Kiev')
     if request.user.is_authenticated:
         current_user = request.user
-        messages = Message.objects.filter(receivers__user=current_user) \
+        messages = Message.objects.filter(receivers__user=current_user, receivers__show=True) \
             .exclude(send_date__isnull=False, send_date__gt=datetime.datetime.now())\
-            .exclude(sender=current_user)\
             .order_by('-id')
 
         return search(request, page, messages)
@@ -65,7 +64,9 @@ def search_send(request, page):
     activate('Europe/Kiev')
     if request.user.is_authenticated:
         current_user = request.user
-        messages = Message.objects.filter(sender=current_user).order_by('-id')
+        messages = Message.objects.filter(sender=current_user, show=True).order_by('-id')
+
+        print(messages)
         return search(request, page, messages)
     else:
         return render(request, 'mymail/search.html')
@@ -92,18 +93,27 @@ def read_message(request, message_url):
                     message.title = data.get('title')
                     message.text = data.get('text')
                     message.send_date = data.get('send_date')
-                    receivers = data.get('receivers')
-                    todelete = set([r.user for r in message.receivers.all()]) -set(receivers)
-                    to_add = set(receivers) - set([r.user for r in message.receivers.all()])
-                    for i in range(min(len(to_add), len(todelete))):
-                        message.receivers.get(user=todelete.pop()).user = to_add.pop()
-                    for user in to_add:
-                        r = Receivers(user=user, message=message)
+                    receivers_user = data.get('receivers')
+
+                    to_delete = list(message.receivers.all().exclude(user__in=receivers_user))
+                    ids=[r.user.id for r in message.receivers.all()]
+                    to_add = list(receivers_user.exclude(id=current_user.id).exclude(id__in=ids))
+
+                    for i in range(min(len(to_delete), len(to_add))):
+                        r = to_delete.pop()
+                        r.user = to_add.pop()
                         r.save()
-                    message.receivers.filter(user__in=todelete).delete()
+                    for r in to_delete:
+                        r.delete()
+                    for u in to_add:
+                        r = Receivers(user=u, message=message)
+                        r.save()
+
                     if message.emails:
                         del_shcedule(message)
                     message.emails = data.get('emails')
+                    if current_user in receivers_user:
+                        message.show_template = True
                     message.save()
 
                     if message.emails:
@@ -138,13 +148,53 @@ def search_templates(request, page):
     activate('Europe/Kiev')
     if request.user.is_authenticated:
         current_user = request.user
-        messages = Message.objects.filter(receivers__user=current_user, sender=current_user).order_by('-id')
-        return search(request, page, messages)
+        messages = Message.objects\
+            .filter(sender=current_user, show_template=True).order_by('-id')
+        return search(request, page, messages, True)
     else:
         return render(request, 'mymail/search.html')
 
 
-def creation(request, form):
+def delete(request, message_url):
+    message = get_object_or_404(Message, url=message_url)
+    user = request.user
+    if user.is_authenticated:
+        if message.sender == user:
+            message.show = False
+            message.save()
+        elif user in [r.user for r in message.receivers.all()]:
+            r = message.receivers.get(user=user)
+            r.show = False
+            r.save()
+        delete_mess_without_show(message)
+    return redirect('search_received', page=0)
+
+
+def delete_template(request, message_url):
+    message = get_object_or_404(Message, url=message_url)
+    user = request.user
+    if user.is_authenticated and message.sender == user:
+        message.show_template = False
+        message.save()
+        delete_mess_without_show(message)
+    return redirect('search_templates', page=0)
+
+
+def delete_mess_without_show(message):
+    if message.show is False and not message.receivers.filter(show=True) and not message.show_template:
+        del_shcedule(message)
+        message.delete()
+
+
+def just_delete(request, message_url):
+    message = get_object_or_404(Message, url=message_url)
+    if request.user == message.sender:
+        del_shcedule(message)
+        message.delete()
+    return redirect('home')
+
+
+def creation(request, form, template=False, message=''):
     if request.method == "POST" and form.is_valid():
         print("request - {}".format(request.POST))
         data = form.cleaned_data
@@ -156,16 +206,19 @@ def creation(request, form):
         emails = data.get('emails')
 
         message = Message(sender=request.user, title=title, text=text, send_date=send_date, emails=emails)
-        if not send_date:
-            message.send_date = message.pub_date
+        if request.user in receivers:
+            message.show_template = True
+
+            if len(receivers) == 1:
+                message.show = False
         message.save()
         if emails:
             send_mail_sheduled(message)
-        if receivers:
-            for receiver in receivers:
-                r = Receivers(user=receiver, message=message)
-                r.save()
+        for receiver in receivers.exclude(id=request.user.id):
+            r = Receivers(user=receiver, message=message)
+            r.save()
         return redirect('send/0')
+
     return render(request, "mymail/create_message.html", locals())
 
 
@@ -175,7 +228,7 @@ def create_from_template(request, message_url):
         message = Message.objects.get(url=message_url, sender=request.user)
         initial_dict = {
             "title": message.title,
-            "receivers": [r.user for r in message.receivers.all()],
+            "receivers": [r.user for r in message.receivers.all().exclude(user=request.user)],
             "text": message.text,
             "send_date": message.send_date,
             "emails": message.emails
@@ -183,7 +236,7 @@ def create_from_template(request, message_url):
     except ObjectDoesNotExist:
         return redirect('create_message')
     form = MessageForm(request.POST or None, initial=initial_dict)
-    return creation(request, form)
+    return creation(request, form, True, message)
 
 
 def create_message(request):

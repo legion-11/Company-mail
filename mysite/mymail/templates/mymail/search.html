@@ -3,7 +3,7 @@
     {% if messages %}
     <ul>
         {% for message in messages %}
-            {% if template%}
+            {% if template %}
                 <li><a href="{% url 'create_from_template' message.url %}">{{ message.title|add:"." }}</a></li>
             {%else%}
                 <li><a href="{% url 'read_message' message.url %}">{{ message.title|add:"." }}</a></li>
@@ -19,7 +19,4 @@
     {% else %}
         <p>No messages.</p>
     {% endif %}
-{% else %}
-    <a href="{% url 'login_view' %}">LOGIN</a></body><br/>
-    <a href="{% url 'registration' %}">REGISTRATION</a>
 {% endif %}
