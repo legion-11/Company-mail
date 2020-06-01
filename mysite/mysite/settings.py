@@ -32,7 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'mymail.apps.MymailConfig',
+    # 'mymail.apps.MymailConfig',
+    'mymail',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,10 +55,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'mysite.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, r'mymail\templates\mymail')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -136,3 +138,4 @@ EMAIL_USE_TLS = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+

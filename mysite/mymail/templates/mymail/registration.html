@@ -1,17 +1,47 @@
-{%  if form.errors %}
-    <p>Your password or username didn't match</p>
-{% endif %}
+{% include "mymail/base.html" %}
+{% block content %}
+
+<div class="container ml-2 mt-2 col-5">
+
+<p class="text-danger">{{form.errors}}</p>
 
 {% if user.is_authenticated %}
-    <p>you are authenticated</p>
-    <a href="/">Home</a>
+    <h1 class="ml-5 center text-center">You are already authenticated</h1>
 {% else %}
-    <form method="post" action="{% url 'registration' %}"> {% csrf_token %}
-            {{form.as_p}}
-            <div>
-                <input type="submit" value="submit" />
-                <input type="hidden" name="next" value="{{ next }}" />
-            </div>
-        </form>
+
+<form method="post" action=""> {% csrf_token %}
+    <div class="form-group">
+        <label for="Username">Username</label>
+        <input name="username" class="form-control" id="Username"   placeholder="Enter username">
+        <small id="loginHelp" class="form-text text-muted">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only</small>
+
+    </div>
+
+    <div class="form-group">
+        <label for="Email">Email address</label>
+        <input name="email" type="email" class="form-control" id="Email" aria-describedby="emailHelp" placeholder="Enter email">
+    </div>
+
+    <div class="form-group">
+        <label for="Password">Password</label>
+        <input name="password1" type="password" class="form-control" id="Password" placeholder="Password">
+        <small id="passwordHelp" class="form-text text-muted">We'll never share your password with anyone else.</small>
+        <small id="passwordHelp2" class="form-text text-muted">Your password can’t be too similar to your other personal information.</small>
+        <small id="passwordHelp3" class="form-text text-muted">Your password must contain at least 8 characters.</small>
+        <small id="passwordHelp4" class="form-text text-muted">Your password can’t be a commonly used password.</small>
+        <small id="passwordHelp5" class="form-text text-muted">Your password can’t be entirely numeric..</small>
+    </div>
+
+    <div class="form-group">
+        <label for="Password2">Password confirmation:</label>
+        <input name="password2" type="password" class="form-control" id="Password2" placeholder="Password">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+    <input type="hidden" name="next" value="{{ next }}" />
+</form>
+
 {% endif %}
+</div>
+{% endblock %}
 

@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, get_object_or_404
-from .forms import UserForm, LoginForm, MessageForm
+from .forms import MessageForm
 from .models import Message, Receivers
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -242,44 +242,3 @@ def create_from_template(request, message_url):
 def create_message(request):
     form = MessageForm(request.POST or None)
     return creation(request, form)
-
-
-def registration(request):
-    form = UserForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        print("request - {}".format(request.POST))
-        data = form.cleaned_data
-        print("cleaned data - {}".format(data))
-
-        name = request.POST.get('username')
-        password = request.POST.get('password')
-        user = User(username=name)
-
-        user.set_password(password)
-        user.save()
-        user = authenticate(username=name, password=password)
-
-        if user is not None:
-            login(request, user)
-            return redirect('/')
-
-    return render(request, "mymail/registration.html", locals())
-
-
-def login_view(request):
-    form = LoginForm(request.POST or None)
-    if request.method == "POST":
-        print("request - {}".format(request.POST))
-        data = form.cleaned_data
-        print("cleaned data - {}".format(data))
-
-        name = request.POST.get('username')
-        password = request.POST.get('password')
-        user = User(username=name, password=password)
-        user = authenticate(username=name, password=password)
-
-        if user is not None:
-            login(request, user)
-            return redirect('/')
-
-    return render(request, "mymail/login.html", locals())

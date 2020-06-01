@@ -1,25 +1,45 @@
 {% include "mymail/base.html" %}
+
+{% block content %}
+
+<div class="container ml-2 mt-2">
+
 {% if message %}
-    Sender: <a>{{ message.sender }}</a>
-    {% if message.send_date %}
-        {{ message.send_date }}<br>
-    {% else %}
-        {{ message.pub_date }}<br>
-    {% endif %}
+        <p class="h4"> Message detail info</p>
+        <hr>
+        <p><strong>Sender: </strong>{{ message.sender }}</p>
+        <p class="h5">
+            {% if message.send_date %}
+                {{ message.send_date }}
+            {% else %}
+                {{ message.pub_date }}
+            {% endif %}
+        </p>
+        <br>
 
-    <br>Receivers:</br>
-    {% for receiver in message.receivers.all %}
-        {{ receiver.user.username }}<br>
-    {% endfor %}
-    {% for email in message.emails %}
-        {{ email }}<br>
-    {% endfor %}
-    {{message.external_receivers}}
-    <h1><a>{{ message.title }}</a></h1>
-    <br>{{ message.text }}</br>
-    <form action="{% url 'delete' message.url %}" method="post">
-        {% csrf_token %}
-    <input type="submit" value="Delete">
+        <p class="h4"><strong>Receivers:</strong></p>
+        <div class="ml-5">
+            {% for receiver in message.receivers.all %}
+                <p class="h6">{{ receiver.user.username }}</p>
+            {% endfor %}
+            {% for email in message.emails %}
+                <p class="h6">{{ email }}</p>
+            {% endfor %}
+            <p class="h6">{{message.external_receivers}}</p>
+        </div>
+        <br>
 
-</form>
+        <p class="h1">{{ message.title }}</p>
+        <br>
+        <p class="h5 ml-5">{{ message.text }}</p>
+        <br>
+
+        <form action="{% url 'delete' message.url %}" method="post">
+            {% csrf_token %}
+        <input class="btn btn-danger" type="submit" value="Delete">
+
+    </form>
 {% endif %}
+
+</div>
+{% endblock %}
