@@ -10,7 +10,7 @@
         <ul class="list-group list-group-flush">
             {% for message in messages %}
                 <li class="list-group-item">
-                    {% if template %}
+                    {% if what_search == "Templates" %}
                         <a style="display:block" href="{% url 'create_from_template' message.url %}" class="text-decoration-none">
                             <div class="h4 text-primary">
                                 <div>
@@ -26,7 +26,42 @@
                             </div>
 
                         </a>
-
+                    {% elif what_search == "Received messages" %}
+                        {% if message|slice:"1:2" %}
+                            {% for m in message|slice:"0:1" %}
+                                <a style="display:block" href="{% url 'read_message' m.url %}">
+                                    <div class="h4 text-secondary">
+                                        <div>
+                                            {%if m.title%}
+                                                {{ m.title　}}
+                                            {%else%}
+                                                No title
+                                            {%endif%}
+                                        </div>
+                                        <div class="h6 text-secondary">
+                                            {{m.text|slice:":70" }}
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor%}
+                        {% else %}
+                            {% for m in message|slice:"0:1" %}
+                                <a style="display:block" href="{% url 'read_message' m.url %}">
+                                    <div class="h4 text-primary">
+                                        <div>
+                                            {%if m.title%}
+                                                {{ m.title　}}
+                                            {%else%}
+                                                No title
+                                            {%endif%}
+                                        </div>
+                                        <div class="h6 text-secondary">
+                                            {{m.text|slice:":70" }}
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor%}
+                        {% endif %}
                     {% else %}
                         <a style="display:block" href="{% url 'read_message' message.url %}">
                             <div class="h4 text-primary">
@@ -41,7 +76,6 @@
                                     {{message.text|slice:":70" }}
                                 </div>
                             </div>
-
                         </a>
                     {% endif %}
                 </li>

@@ -37,14 +37,14 @@ def del_shcedule(message):
         print('not found')
 
 
-def search(request, page, messages, template=False, what_search=''):
+def search(request, page, messages, what_search):
     number_print = 30
     more = len(messages) > number_print * (page + 1)
     return render(request, 'mymail/search.html',
                   {"messages": messages[number_print * page: number_print * (page + 1)],
                    "next_page": page + 1,
                    "prev_page": page - 1,
-                   "more": more, "template": template, "what_search": what_search})
+                   "more": more, "what_search": what_search})
 
 
 def search_received(request, page):
@@ -54,7 +54,8 @@ def search_received(request, page):
         messages = Message.objects.filter(receivers__user=current_user, receivers__show=True) \
             .exclude(send_date__isnull=False, send_date__gt=datetime.datetime.now())\
             .order_by('-id')
-
+        read = Receivers.objects.filter(message__in=messages, user=current_user).order_by('-message')
+        messages = list(zip(messages, read))
         return search(request, page, messages, what_search='Received messages')
     else:
         return render(request, 'mymail/search.html', {'what_search': 'Received messages'})
@@ -150,7 +151,7 @@ def search_templates(request, page):
         current_user = request.user
         messages = Message.objects\
             .filter(sender=current_user, show_template=True).order_by('-id')
-        return search(request, page, messages, True, 'Templates')
+        return search(request, page, messages, 'Templates')
     else:
         return render(request, 'mymail/search.html', {'what_search': 'Templates'})
 
