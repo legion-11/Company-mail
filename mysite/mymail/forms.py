@@ -14,8 +14,7 @@ class DateTimeInput(forms.DateTimeInput):
 
 
 class MessageForm(forms.ModelForm):
-    receivers = forms.ModelMultipleChoiceField(User.objects,
-                                               required=False,)
+    receivers = forms.ModelMultipleChoiceField(User.objects, required=False,)
     title = forms.CharField(required=False)
     text = forms.Textarea()
     send_date = forms.DateTimeField(required=False, widget=DateTimeInput,
@@ -42,3 +41,10 @@ class MessageForm(forms.ModelForm):
                         params={'value': date},
                     )
         return date
+
+    def clean_receivers(self):
+        receivers = self.cleaned_data.get('receivers')
+        emails = self.cleaned_data.get('emails')
+        if not receivers and not emails:
+            raise forms.ValidationError(_('Error: No receivers or emails'))
+        return receivers

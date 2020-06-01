@@ -5,17 +5,44 @@
 <div class="container ml-2">
 
 {% if user.is_authenticated %}
-    <p class="h2 mt-2">Received Messages</p>
+    <p class="h2 mt-2">{{what_search}}</p>
     {% if messages %}
         <ul class="list-group list-group-flush">
             {% for message in messages %}
                 <li class="list-group-item">
                     {% if template %}
-                    <a class="h3 text-primary" href="{% url 'create_from_template' message.url %}">
-                        {{ message.title|add:"." }}
-                    </a>
+                        <a style="display:block" href="{% url 'create_from_template' message.url %}" class="text-decoration-none">
+                            <div class="h4 text-primary">
+                                <div>
+                                    {%if message.title%}
+                                        {{ message.title　}}
+                                    {%else%}
+                                        No title
+                                    {%endif%}
+                                </div>
+                                <div class="h6 text-secondary">
+                                    {{message.text|slice:":70" }}
+                                </div>
+                            </div>
+
+                        </a>
+
                     {% else %}
-                    <a class="h3 text-primary" href="{% url 'read_message' message.url %}">{{ message.title|add:"." }}</a>
+                        <a style="display:block" href="{% url 'read_message' message.url %}">
+                            <div class="h4 text-primary">
+                                <div>
+                                    {%if message.title%}
+                                        {{ message.title　}}
+                                    {%else%}
+                                        No title
+                                    {%endif%}
+                                </div>
+                                <div class="h6 text-secondary">
+                                    {{message.text|slice:":70" }}
+                                </div>
+                            </div>
+
+                        </a>
                     {% endif %}
                 </li>
             {% endfor %}

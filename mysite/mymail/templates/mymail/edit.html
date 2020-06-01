@@ -40,6 +40,8 @@
         <button class="btn btn-primary" type="submit">Submit form</button>
         <input name="next" type="hidden" value="{{ next }}"/>
 
+        <p class="text-danger">{{form.errors}}</p>
+        
     </form>
 
     <form class="mt-1" action="{% url 'just_delete' message.url %}" method="post">

@@ -37,14 +37,14 @@ def del_shcedule(message):
         print('not found')
 
 
-def search(request, page, messages, template=False):
+def search(request, page, messages, template=False, what_search=''):
     number_print = 30
     more = len(messages) > number_print * (page + 1)
     return render(request, 'mymail/search.html',
                   {"messages": messages[number_print * page: number_print * (page + 1)],
                    "next_page": page + 1,
                    "prev_page": page - 1,
-                   "more": more, "template": template})
+                   "more": more, "template": template, "what_search": what_search})
 
 
 def search_received(request, page):
@@ -55,9 +55,9 @@ def search_received(request, page):
             .exclude(send_date__isnull=False, send_date__gt=datetime.datetime.now())\
             .order_by('-id')
 
-        return search(request, page, messages)
+        return search(request, page, messages, what_search='Received messages')
     else:
-        return render(request, 'mymail/search.html')
+        return render(request, 'mymail/search.html', {'what_search': 'Received messages'})
 
 
 def search_send(request, page):
@@ -67,9 +67,9 @@ def search_send(request, page):
         messages = Message.objects.filter(sender=current_user, show=True).order_by('-id')
 
         print(messages)
-        return search(request, page, messages)
+        return search(request, page, messages, what_search='Send messages')
     else:
-        return render(request, 'mymail/search.html')
+        return render(request, 'mymail/search.html', {'what_search': 'Send messages'})
 
 
 def read_message(request, message_url):
@@ -150,9 +150,9 @@ def search_templates(request, page):
         current_user = request.user
         messages = Message.objects\
             .filter(sender=current_user, show_template=True).order_by('-id')
-        return search(request, page, messages, True)
+        return search(request, page, messages, True, 'Templates')
     else:
-        return render(request, 'mymail/search.html')
+        return render(request, 'mymail/search.html', {'what_search': 'Templates'})
 
 
 def delete(request, message_url):
@@ -188,7 +188,7 @@ def delete_mess_without_show(message):
 
 def just_delete(request, message_url):
     message = get_object_or_404(Message, url=message_url)
-    if request.user == message.sender:
+    if request.user == message.sender and message.send_date > now():
         del_shcedule(message)
         message.delete()
     return redirect('home')
