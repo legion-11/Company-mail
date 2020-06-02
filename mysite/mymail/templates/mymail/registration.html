@@ -3,7 +3,11 @@
 
 <div class="container ml-2 mt-2 col-5">
 
-<p class="text-danger">{{form.errors}}</p>
+{%if form.errors%}
+    <div class="alert alert-danger" role="alert">
+        {{form.errors}}
+    </div>
+{%endif%}
 
 {% if user.is_authenticated %}
     <h1 class="ml-5 center text-center">You are already authenticated</h1>
