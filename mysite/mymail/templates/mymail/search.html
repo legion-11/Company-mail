@@ -3,6 +3,7 @@
 {% block content %}
 
 <div class="container ml-2">
+{% load mymail_extras %}
 
 {% if user.is_authenticated %}
     <p class="h2 mt-2">{{what_search}}</p>
@@ -76,13 +77,16 @@
                     {% endif %}
                 </li>
             {% endfor %}
-
-            {% if prev_page > -1%}
-                <a href="{% url 'search_received' prev_page %}">previous</a>
-            {% endif %}
-            {% if more%}
-                <a href="{% url 'search_received' next_page %}">next</a>
-            {% endif %}
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    {% if  page|subtract:1 > -1%}
+                    <li class="page-item"><a class="page-link" href="{{ page|subtract:1}}">{{ page|subtract:1}}</a></li>
+                    {% endif %}
+                    {% if more%}
+                    <li class="page-item"><a class="page-link" href="{{ page|add:1}}">{{ page|add:1}}</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
         </ul>
 
     {% else %}

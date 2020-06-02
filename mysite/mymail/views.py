@@ -19,12 +19,10 @@ def just_send_mail(message):
 
 def send_mail_sheduled(message):
     if message.send_date:
-        print('schedule add_b {}'.format(scheduler.get_jobs()))
         scheduler.pause()
         scheduler.add_job(func=just_send_mail, trigger='date',
                           run_date=message.send_date, args=[message], id=str(message.url))
         scheduler.resume()
-        print('schedule add_a {}'.format(scheduler.get_jobs()))
     else:
         just_send_mail(message)
 
@@ -41,8 +39,7 @@ def search(request, page, messages, what_search):
     more = len(messages) > number_print * (page + 1)
     return render(request, 'mymail/search.html',
                   {"messages": messages[number_print * page: number_print * (page + 1)],
-                   "next_page": page + 1,
-                   "prev_page": page - 1,
+                   "page": page,
                    "more": more, "what_search": what_search})
 
 
@@ -50,12 +47,10 @@ def search_received(request, page):
     activate('Europe/Kiev')
     if request.user.is_authenticated:
         current_user = request.user
-        messages = Message.objects.filter(receivers__user=current_user, receivers__show=True) \
-            .exclude(send_date__isnull=False, send_date__gt=datetime.datetime.now())\
-            .order_by('-id')
-        messages = Receivers.objects.filter(message__in=messages, user=current_user).order_by('-message')
-        # messages = list(zip(messages, read))
-        # print(messages)
+        messages = Receivers.objects.filter(show=True, user=current_user)\
+            .exclude(message__send_date__isnull=False,
+                     message__send_date__gt=datetime.datetime.now())\
+            .order_by('-message')
         return search(request, page, messages, what_search='Received messages')
     else:
         return render(request, 'mymail/search.html', {'what_search': 'Received messages'})
@@ -66,8 +61,6 @@ def search_send(request, page):
     if request.user.is_authenticated:
         current_user = request.user
         messages = Message.objects.filter(sender=current_user, show=True).order_by('-id')
-
-        print(messages)
         return search(request, page, messages, what_search='Send messages')
     else:
         return render(request, 'mymail/search.html', {'what_search': 'Send messages'})
@@ -149,8 +142,7 @@ def search_templates(request, page):
     activate('Europe/Kiev')
     if request.user.is_authenticated:
         current_user = request.user
-        messages = Message.objects\
-            .filter(sender=current_user, show_template=True).order_by('-id')
+        messages = Message.objects.filter(sender=current_user, show_template=True).order_by('-id')
         return search(request, page, messages, 'Templates')
     else:
         return render(request, 'mymail/search.html', {'what_search': 'Templates'})

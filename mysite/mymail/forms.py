@@ -35,6 +35,7 @@ class MessageForm(forms.ModelForm):
 
     def clean_send_date(self):
         date = self.cleaned_data.get('send_date')
+        cd = self.cleaned_data
         if date:
             if date < timezone.now():
                 raise forms.ValidationError(_('Invalid datetime: %(value)s'),
@@ -42,9 +43,9 @@ class MessageForm(forms.ModelForm):
                     )
         return date
 
-    def clean_receivers(self):
+    def clean(self):
         receivers = self.cleaned_data.get('receivers')
         emails = self.cleaned_data.get('emails')
         if not receivers and not emails:
             raise forms.ValidationError(_('Error: No receivers or emails'))
-        return receivers
+        return self.cleaned_data
