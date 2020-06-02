@@ -37,7 +37,7 @@ class MessageForm(forms.ModelForm):
         date = self.cleaned_data.get('send_date')
         if date:
             if date < timezone.now():
-                raise forms.ValidationError(_('Invalid value: %(value)s'),
+                raise forms.ValidationError(_('Invalid datetime: %(value)s'),
                         params={'value': date},
                     )
         return date

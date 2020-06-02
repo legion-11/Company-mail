@@ -9,7 +9,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from django.utils.timezone import activate, now
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
-from django.db.models import Count, Q
 scheduler = BackgroundScheduler()
 scheduler.start()
 
@@ -54,8 +53,9 @@ def search_received(request, page):
         messages = Message.objects.filter(receivers__user=current_user, receivers__show=True) \
             .exclude(send_date__isnull=False, send_date__gt=datetime.datetime.now())\
             .order_by('-id')
-        read = Receivers.objects.filter(message__in=messages, user=current_user).order_by('-message')
-        messages = list(zip(messages, read))
+        messages = Receivers.objects.filter(message__in=messages, user=current_user).order_by('-message')
+        # messages = list(zip(messages, read))
+        # print(messages)
         return search(request, page, messages, what_search='Received messages')
     else:
         return render(request, 'mymail/search.html', {'what_search': 'Received messages'})
