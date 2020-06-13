@@ -21,8 +21,8 @@
                                         No title
                                     {%endif%}
                                 </div>
-                                <div class="h6 text-secondary">
-                                    {{message.text|slice:":70" }}
+                                <div class="h6 text-secondary text-truncate">
+                                    {{message.text }}
                                 </div>
                             </div>
 
@@ -45,35 +45,52 @@
                                 </a>
                        {% else %}
                             <a style="display:block" href="{% url 'read_message' message.message.url %}">
-                                    <div class="h4 text-primary">
-                                        <div>
-                                            {%if message.message.title%}
-                                                {{ message.message.title　}}
-                                            {%else%}
-                                                No title
-                                            {%endif%}
-                                        </div>
-                                        <div class="h6 text-secondary text-truncate">
-                                            {{message.message.text}}
-                                        </div>
+                                <div class="h4 text-primary">
+                                    <div>
+                                        {%if message.message.title%}
+                                        {{ message.message.title　}}
+                                        {%else%}
+                                        No title
+                                        {%endif%}
                                     </div>
-                                </a>
+                                    <div class="h6 text-secondary text-truncate">
+                                        {{message.message.text}}
+                                    </div>
+                                </div>
+                            </a>
                        {% endif %}
                     {% else %}
-                        <a style="display:block" href="{% url 'read_message' message.url %}">
-                            <div class="h4 text-primary">
-                                <div>
-                                    {%if message.title%}
-                                        {{ message.title　}}
-                                    {%else%}
-                                        No title
-                                    {%endif%}
+                        {%if not message.send_date or  message.date < now  %}
+                            <a style="display:block" href="{% url 'read_message' message.url %}">
+                                <div class="h4 text-secondary">
+                                    <div>
+                                        {%if message.title%}
+                                            {{ message.title　}}
+                                        {%else%}
+                                            No title
+                                        {%endif%}
+                                    </div>
+                                    <div class="h6 text-secondary text-truncate">
+                                        {{message.text}}
+                                    </div>
                                 </div>
-                                <div class="h6 text-secondary text-truncate">
-                                    {{message.text}}
+                            </a>
+                        {% else %}
+                            <a style="display:block" href="{% url 'read_message' message.url %}">
+                                <div class="h4 text-primary">
+                                    <div>
+                                        {%if message.title%}
+                                            {{ message.title　}}
+                                        {%else%}
+                                            No title
+                                        {%endif%}
+                                    </div>
+                                    <div class="h6 text-secondary text-truncate">
+                                        {{message.text}}
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        {% endif %}
                     {% endif %}
                 </li>
             {% endfor %}

@@ -43,7 +43,9 @@
         </div>
         {%endif%}
         {% if template %}
-            <a href="{% url 'delete_template' message.url %}">Delete</a>
+        <form action="{% url 'delete' message.url %}" method="post">
+            {% csrf_token %}
+        <input class="btn btn-danger" type="submit" value="Delete">
         {% endif %}
 
         <input type="hidden" name="next" value="{{ next }}"/>

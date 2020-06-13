@@ -21,16 +21,3 @@ urlpatterns = [
     path(r'logout/', LogoutView.as_view(), name='logout'),
     path(r'login/', LoginView.as_view(template_name="mymail/login.html"), name='login_view'),
 ]
-''
-'received/<int:page>'
-'send/<int:page>'
-'templates/<int:page>'
-'<uuid:message_url>'
-'new'
-'delete/<uuid:message_url>'
-'just_delete/<uuid:message_url>'
-'delete/<uuid:message_url>/Template'
-'new/<uuid:message_url>'
-r'registration/'
-r'logout/'
-r'login/'
